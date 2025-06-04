@@ -1,9 +1,4 @@
-const express = require('express');
-const app = express();
-
-app.use(express.json());
-
-app.post('/parse', (req, res) => {
+export default function handler(req, res) {
   const { transcript } = req.body;
   if (!transcript) return res.status(400).json({ error: 'Missing transcript' });
 
@@ -11,7 +6,7 @@ app.post('/parse', (req, res) => {
   const vipInterest = parseVipInterest(transcript);
 
   return res.status(200).json({ attendance, vipInterest });
-});
+}
 
 function parseAttendance(text) {
   const lower = text.toLowerCase();
@@ -32,13 +27,3 @@ function parseVipInterest(text) {
 
   return "Unknown";
 }
-
-const PORT = process.env.PORT || 3000;
-
-app.get('/', (req, res) => {
-  res.send('✅ Attendance & VIP Parser is working! Use POST /parse');
-});
-
-app.listen(PORT, () => {
-  console.log(`Parser running on port ${PORT}`);
-});
