@@ -1,4 +1,9 @@
-export default function handler(req, res) {
+const express = require('express');
+const app = express();
+
+app.use(express.json());
+
+app.post('/parse', (req, res) => {
   const { transcript } = req.body;
   if (!transcript) return res.status(400).json({ error: 'Missing transcript' });
 
@@ -6,28 +11,34 @@ export default function handler(req, res) {
   const vipInterest = parseVipInterest(transcript);
 
   return res.status(200).json({ attendance, vipInterest });
-}
+});
 
 function parseAttendance(text) {
   const lower = text.toLowerCase();
-  const yes = ["confirmed they would attend", "will attend", "agreed to attend", "looking forward", "asked for the date", "will be there"];
-  const no = ["cannot attend", "won't attend", "declined", "not attending", "can't make it"];
-  const maybe = ["not sure", "might attend", "thinking about it", "checking calendar"];
 
-  if (yes.some(p => lower.includes(p))) return "Yes";
-  if (no.some(p => lower.includes(p))) return "No";
-  if (maybe.some(p => lower.includes(p))) return "Maybe";
+  if (lower.includes("attendance: confirmed they would attend")) return "Yes";
+  if (lower.includes("attendance: won't be able to attend")) return "No";
+  if (lower.includes("attendance: unclear")) return "Maybe";
 
   return "Unknown";
 }
 
 function parseVipInterest(text) {
   const lower = text.toLowerCase();
-  const yes = ["expressed interest in vip", "interested in vip", "asked about vip", "wants to upgrade", "wants vip", "requested an email"];
-  const no = ["not interested in vip", "declined vip", "no upgrade", "no interest"];
 
-  if (yes.some(p => lower.includes(p))) return "Yes";
-  if (no.some(p => lower.includes(p))) return "No";
+  if (lower.includes("vip interest: expressed interest in vip")) return "Yes";
+  if (lower.includes("vip interest: not interested in vip")) return "No";
+  if (lower.includes("vip interest: not discussed")) return "No";
 
   return "Unknown";
 }
+
+const PORT = process.env.PORT || 3000;
+
+app.get('/', (req, res) => {
+  res.send('✅ Attendance & VIP Parser is working! Use POST /parse');
+});
+
+app.listen(PORT, () => {
+  console.log(`Parser running on port ${PORT}`);
+});
