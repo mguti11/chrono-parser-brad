@@ -1,0 +1,15 @@
+{
+  "name": "attendance-vip-parser",
+  "version": "1.0.0",
+  "description": "Parses transcript summaries for attendance and VIP upgrade intent",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}
